@@ -1,5 +1,5 @@
 # Proyecto Final - Analisis Numerico
-Realizado por:
+#### Realizado por:
 - Juan Pablo Mejia
 - Samuel Alarcon
 - Alejandro Zapata
