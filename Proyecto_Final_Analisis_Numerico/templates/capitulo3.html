@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Capítulo 3 - Interpolación{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="text-primary mb-4">Capítulo 3: Interpolación Numérica</h1>
+        
+        <div class="help-section">
+            <h5><i class="fas fa-info-circle"></i> Ayuda del Capítulo 3</h5>
+            <ul>
+                <li>El vector X o el vector Y no pueden tener valores repetidos.</li>
+                <li>Se necesitan al menos 2 puntos para realizar interpolación.</li>
+                <li>Para mejores resultados, ordene los puntos por valor de X.</li>
+            </ul>
+        </div>
+
+        <div class="method-card">
+            <form id="interpolationForm">
+                <h5>Puntos de Datos</h5>
+                <div class="row">
+                    {% for i in range(8) %}
+                    <div class="col-md-3 mb-2">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text">X{{i+1}}</span>
+                            <input type="text" class="form-control" name="x{{i}}" placeholder="X{{i+1}}">
+                            <span class="input-group-text">Y{{i+1}}</span>
+                            <input type="text" class="form-control" name="y{{i}}" placeholder="Y{{i+1}}">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="x_eval" class="form-label">Valor de x para evaluar:</label>
+                            <input type="number" class="form-control" id="x_eval" name="x_eval" 
+                                   step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="y_real" class="form-label">Valor esperado de f(x) (opcional):</label>
+                            <input type="number" class="form-control" id="y_real" name="y_real" 
+                                   step="0.01">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Seleccione los métodos a ejecutar:</label>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="vandermonde" name="metodo" value="Vandermonde" checked>
+                                <label class="form-check-label" for="vandermonde">Vandermonde</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="newton" name="metodo" value="Newton" checked>
+                                <label class="form-check-label" for="newton">Newton</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="lagrange" name="metodo" value="Lagrange" checked>
+                                <label class="form-check-label" for="lagrange">Lagrange</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="spline_lineal" name="metodo" value="Spline Lineal">
+                                <label class="form-check-label" for="spline_lineal">Spline Lineal</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="spline_cubico" name="metodo" value="Spline Cúbico">
+                                <label class="form-check-label" for="spline_cubico">Spline Cúbico</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Ejecutar Métodos</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Calculando...</span>
+            </div>
+            <p class="mt-2">Calculando... Por favor espere.</p>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+</div>
+
+<script>
+document.getElementById('interpolationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const metodos = [];
+    document.querySelectorAll('input[name="metodo"]:checked').forEach(cb => {
+        metodos.push(cb.value);
+    });
+    
+    if (metodos.length === 0) {
+        alert('Por favor seleccione al menos un método.');
+        return;
+    }
+    
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').innerHTML = '';
+    
+    fetch('/calculate_cap3', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('loading').style.display = 'none';
+        if (data.error) {
+            document.getElementById('results').innerHTML = `<div class="error-message">${data.error}</div>`;
+        } else {
+            displayInterpolationResults(data);
+        }
+    })
+    .catch(error => {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('results').innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+    });
+});
+
+function displayInterpolationResults(data) {
+    let html = '<div class="result-section"><h4>Resultados:</h4>';
+    
+    // Tabla de resultados
+    html += `
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Método</th>
+                    <th>Resultado</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    data.resultados.forEach(r => {
+        html += `
+            <tr>
+                <td>${r.metodo}</td>
+                <td>${r.resultado.toFixed(6)}</td>
+                <td>${r.error.toFixed(6)}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+            </tbody>
+        </table>
+        <div class="alert alert-success">
+            <strong>Método más preciso:</strong> ${data.mejor_metodo}
+        </div>
+    `;
+    
+    // Polinomios
+    if (Object.keys(data.polinomios).length > 0) {
+        html += '<h5>Polinomios obtenidos:</h5><ul>';
+        for (const [metodo, poly] of Object.entries(data.polinomios)) {
+            html += `<li><strong>${metodo}:</strong> ${poly}</li>`;
+        }
+        html += '</ul>';
+    }
+    
+    // Gráfico
+    if (data.grafico) {
+        html += `
+            <h5>Gráfico de métodos:</h5>
+            <div class="text-center">
+                <img src="data:image/png;base64,${data.grafico}" alt="Gráfico de interpolación" class="img-fluid">
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    document.getElementById('results').innerHTML = html;
+}
+</script>
+{% endblock %}

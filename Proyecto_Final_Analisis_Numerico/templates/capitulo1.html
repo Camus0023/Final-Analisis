@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}Capítulo 1 - Raíces de Ecuaciones{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="text-primary mb-4">Capítulo 1: Métodos para Encontrar Raíces</h1>
+        
+        <div class="help-section">
+            <h5><i class="fas fa-info-circle"></i> Ayuda del Capítulo 1</h5>
+            <ul>
+                <li>Asegúrate de que la función proporcionada contenga una raíz.</li>
+                <li>La función debe ser continua y diferenciable.</li>
+                <li>En el método de bisección, el valor de xi debe ser menor al de xs, además de que estos dos valores deben existir en la función.</li>
+                <li>En el método de raíces múltiples, asegúrate de que las derivadas de la función sean correctas.</li>
+            </ul>
+        </div>
+
+        <div class="method-card">
+            <form id="methodForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="function" class="form-label">Función f(x):</label>
+                            <input type="text" class="form-control" id="function" name="function" 
+                                   value="x**3 - x - 2" placeholder="Ejemplo: x**3 - x - 2">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="derivative" class="form-label">Derivada f'(x) (para Newton y Raíces Múltiples):</label>
+                            <input type="text" class="form-control" id="derivative" name="derivative" 
+                                   value="3*x**2 - 1" placeholder="Ejemplo: 3*x**2 - 1">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="interval_a" class="form-label">Intervalo inicial a:</label>
+                                    <input type="number" class="form-control" id="interval_a" name="interval_a" 
+                                           value="1" step="0.1">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="interval_b" class="form-label">Intervalo inicial b:</label>
+                                    <input type="number" class="form-control" id="interval_b" name="interval_b" 
+                                           value="2" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="x0" class="form-label">Valor inicial x0:</label>
+                            <input type="number" class="form-control" id="x0" name="x0" 
+                                   value="1.5" step="0.1">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tolerance" class="form-label">Tolerancia:</label>
+                            <input type="number" class="form-control" id="tolerance" name="tolerance" 
+                                   value="0.0001" step="0.0001">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="max_iterations" class="form-label">Iteraciones máximas:</label>
+                            <input type="number" class="form-control" id="max_iterations" name="max_iterations" 
+                                   value="100">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Métodos a ejecutar:</label>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="bisection" name="methods" value="bisection" checked>
+                                <label class="form-check-label" for="bisection">Bisección</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="false_position" name="methods" value="false_position" checked>
+                                <label class="form-check-label" for="false_position">Regla Falsa</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="fixed_point" name="methods" value="fixed_point">
+                                <label class="form-check-label" for="fixed_point">Punto Fijo</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="newton" name="methods" value="newton" checked>
+                                <label class="form-check-label" for="newton">Newton-Raphson</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="secant" name="methods" value="secant" checked>
+                                <label class="form-check-label" for="secant">Secante</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="multiple_roots" name="methods" value="multiple_roots">
+                                <label class="form-check-label" for="multiple_roots">Raíces Múltiples</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Calcular</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Calculando...</span>
+            </div>
+            <p class="mt-2">Calculando... Por favor espere.</p>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+</div>
+
+<script>
+document.getElementById('methodForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const methods = [];
+    document.querySelectorAll('input[name="methods"]:checked').forEach(cb => {
+        methods.push(cb.value);
+    });
+    
+    if (methods.length === 0) {
+        alert('Por favor seleccione al menos un método.');
+        return;
+    }
+    
+    formData.delete('methods');
+    methods.forEach(method => formData.append('methods', method));
+    
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').innerHTML = '';
+    
+    fetch('/calculate_cap1', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('loading').style.display = 'none';
+        if (data.error) {
+            document.getElementById('results').innerHTML = `<div class="error-message">${data.error}</div>`;
+        } else {
+            displayResults(data);
+        }
+    })
+    .catch(error => {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('results').innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+    });
+});
+
+function displayResults(data) {
+    let html = '';
+    
+    if (data.warnings && data.warnings.length > 0) {
+        html += '<div class="alert alert-warning"><strong>Advertencias:</strong><ul>';
+        data.warnings.forEach(warning => {
+            html += `<li>${warning}</li>`;
+        });
+        html += '</ul></div>';
+    }
+    
+    if (data.graph) {
+        html += `
+            <div class="result-section">
+                <h4>Gráfica de la Función</h4>
+                <div class="text-center">
+                    <img src="data:image/png;base64,${data.graph}" alt="Gráfica de la función" class="img-fluid">
+                </div>
+            </div>
+        `;
+    }
+    
+    if (data.results && Object.keys(data.results).length > 0) {
+        html += '<div class="result-section"><h4>Resultados por Método</h4>';
+        
+        for (const [method, result] of Object.entries(data.results)) {
+            html += `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">${getMethodName(method)}</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <strong>Raíz encontrada:</strong><br>
+                                ${result.root !== null ? result.root.toFixed(6) : 'No encontrada'}
+                            </div>
+                            <div class="col-md-2">
+                                <strong>Iteraciones:</strong><br>
+                                ${result.iterations}
+                            </div>
+                            <div class="col-md-2">
+                                <strong>Error:</strong><br>
+                                ${result.error !== null ? result.error.toFixed(8) : 'N/A'}
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Tiempo:</strong><br>
+                                ${(result.execution_time * 1000).toFixed(3)} ms
+                            </div>
+                            <div class="col-md-2">
+                                <strong>Estado:</strong><br>
+                                ${result.converged ? '<span class="text-success">✓ Convergió</span>' : '<span class="text-danger">✗ No convergió</span>'}
+                            </div>
+                        </div>
+                        ${result.message ? `<div class="mt-2"><strong>Nota:</strong> ${result.message}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (data.comparison && Object.keys(data.results).length > 1) {
+            html += `
+                <div class="alert alert-success">
+                    <h5>Comparación de Métodos</h5>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Método</th>
+                                <th>Raíz</th>
+                                <th>Iteraciones</th>
+                                <th>Error</th>
+                                <th>Tiempo (ms)</th>
+                                <th>Convergió</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            for (const [method, result] of Object.entries(data.results)) {
+                const isBest = data.comparison.best_method === method;
+                html += `
+                    <tr ${isBest ? 'class="table-success"' : ''}>
+                        <td>${getMethodName(method)} ${isBest ? '🏆' : ''}</td>
+                        <td>${result.root !== null ? result.root.toFixed(6) : 'N/A'}</td>
+                        <td>${result.iterations}</td>
+                        <td>${result.error !== null ? result.error.toFixed(8) : 'N/A'}</td>
+                        <td>${(result.execution_time * 1000).toFixed(3)}</td>
+                        <td>${result.converged ? '✓' : '✗'}</td>
+                    </tr>
+                `;
+            }
+            
+            html += `
+                        </tbody>
+                    </table>
+                    <p><strong>Método más efectivo:</strong> ${getMethodName(data.comparison.best_method)} 
+                    (${data.comparison.reason})</p>
+                </div>
+            `;
+        }
+        
+        html += '</div>';
+    }
+    
+    document.getElementById('results').innerHTML = html;
+}
+
+function getMethodName(method) {
+    const names = {
+        'bisection': 'Bisección',
+        'false_position': 'Regla Falsa',
+        'fixed_point': 'Punto Fijo',
+        'newton': 'Newton-Raphson',
+        'secant': 'Secante',
+        'multiple_roots': 'Raíces Múltiples'
+    };
+    return names[method] || method;
+}
+</script>
+{% endblock %}

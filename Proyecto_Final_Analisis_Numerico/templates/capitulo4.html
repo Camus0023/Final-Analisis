@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Capítulo 4 - Integración Numérica{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="text-primary mb-4">Capítulo 4: Integración Numérica</h1>
+        
+        <div class="help-section">
+            <h5><i class="fas fa-info-circle"></i> Ayuda del Capítulo 4</h5>
+            <ul>
+                <li><strong>Método del Trapecio:</strong> n debe ser ≥ 1</li>
+                <li><strong>Simpson 1/3:</strong> n debe ser par y ≥ 2</li>
+                <li><strong>Simpson 3/8:</strong> n debe ser múltiplo de 3 y ≥ 3</li>
+                <li>La función debe ser continua en el intervalo de integración.</li>
+                <li>Para mayor precisión, use valores de n más grandes.</li>
+            </ul>
+        </div>
+
+        <!-- Métodos individuales -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="method-card">
+                    <h5 class="text-primary">Método del Trapecio</h5>
+                    <form class="integration-form" data-method="trapecio">
+                        <div class="mb-3">
+                            <label class="form-label">f(x):</label>
+                            <input type="text" class="form-control" name="func" 
+                                   placeholder="exp(x)-2*x" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label">a:</label>
+                                    <input type="number" class="form-control" name="a" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label">b:</label>
+                                    <input type="number" class="form-control" name="b" step="0.01" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">n (≥ 1):</label>
+                            <input type="number" class="form-control" name="n" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Calcular</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="method-card">
+                    <h5 class="text-success">Simpson 1/3</h5>
+                    <form class="integration-form" data-method="simpson13">
+                        <div class="mb-3">
+                            <label class="form-label">f(x):</label>
+                            <input type="text" class="form-control" name="func" 
+                                   placeholder="exp(x)-2*x" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label">a:</label>
+                                    <input type="number" class="form-control" name="a" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label">b:</label>
+                                    <input type="number" class="form-control" name="b" step="0.01" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">n (par, ≥ 2):</label>
+                            <input type="number" class="form-control" name="n" min="2" step="2" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Calcular</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="method-card">
+                    <h5 class="text-warning">Simpson 3/8</h5>
+                    <form class="integration-form" data-method="simpson38">
+                        <div class="mb-3">
+                            <label class="form-label">f(x):</label>
+                            <input type="text" class="form-control" name="func" 
+                                   placeholder="exp(x)-2*x" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label">a:</label>
+                                    <input type="number" class="form-control" name="a" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label">b:</label>
+                                    <input type="number" class="form-control" name="b" step="0.01" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">n (múltiplo de 3, ≥ 3):</label>
+                            <input type="number" class="form-control" name="n" min="3" step="3" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">Calcular</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparación de métodos -->
+        <div class="method-card mt-4">
+            <h5 class="text-info">Comparar los 3 Métodos</h5>
+            <div class="alert alert-info">
+                Introduce la misma función y límites, pero un <code>n</code> distinto para cada método:
+            </div>
+            <form id="compareForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">f(x):</label>
+                            <input type="text" class="form-control" name="func" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">a:</label>
+                            <input type="number" class="form-control" name="a" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">b:</label>
+                            <input type="number" class="form-control" name="b" step="0.01" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">n (Trapecio):</label>
+                            <input type="number" class="form-control" name="n_trap" min="1" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">n (Simpson 1/3):</label>
+                            <input type="number" class="form-control" name="n_s13" min="2" step="2" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">n (Simpson 3/8):</label>
+                            <input type="number" class="form-control" name="n_s38" min="3" step="3" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-info btn-lg">Generar Reporte PDF</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Calculando...</span>
+            </div>
+            <p class="mt-2">Calculando... Por favor espere.</p>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+</div>
+
+<script>
+// Manejar formularios individuales
+document.querySelectorAll('.integration-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const method = this.dataset.method;
+        formData.append('metodo', method);
+        
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('results').innerHTML = '';
+        
+        fetch('/calculate_cap4', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            if (data.error) {
+                document.getElementById('results').innerHTML = `<div class="error-message">${data.error}</div>`;
+            } else {
+                document.getElementById('results').innerHTML = `
+                    <div class="result-section">
+                        <h4>Resultado del ${method.charAt(0).toUpperCase() + method.slice(1)}:</h4>
+                        <div class="alert alert-success">
+                            <strong>Resultado:</strong> ${data.resultado}
+                        </div>
+                        ${data.grafico ? `
+                            <h5>Gráfica:</h5>
+                            <div class="text-center">
+                                <img src="data:image/png;base64,${data.grafico}" alt="Gráfica del método" class="img-fluid">
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('results').innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+        });
+    });
+});
+
+// Manejar comparación
+document.getElementById('compareForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    document.getElementById('loading').style.display = 'block';
+    
+    fetch('/comparar_cap4', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        document.getElementById('loading').style.display = 'none';
+        if (response.ok) {
+            // Descargar PDF
+            return response.blob();
+        } else {
+            throw new Error('Error en la respuesta del servidor');
+        }
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'reporte_integracion.pdf';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        document.getElementById('results').innerHTML = `
+            <div class="alert alert-success">
+                <i class="fas fa-download"></i> Reporte PDF generado y descargado exitosamente.
+            </div>
+        `;
+    })
+    .catch(error => {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('results').innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+    });
+});
+</script>
+{% endblock %}

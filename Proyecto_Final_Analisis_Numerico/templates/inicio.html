@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Análisis Numérico{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="text-center mb-5">
+            <h1 class="display-4 text-primary">Bienvenidos al Proyecto Final</h1>
+            <h2 class="h3 text-secondary">Análisis Numérico</h2>
+            <hr class="my-4">
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">Integrantes del Proyecto</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">👨‍🎓 Andrés Suárez</li>
+                            <li class="list-group-item">👨‍🎓 Alejandro Zapata</li>
+                            <li class="list-group-item">👨‍🎓 Marcelo Castro</li>
+                            <li class="list-group-item">👨‍🎓 Samuel Alarcón</li>
+                            <li class="list-group-item">👨‍🎓 Juan Pablo Mejía</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">Descripción del Proyecto</h5>
+                        <p class="card-text">
+                            Este proyecto implementa y compara diversos métodos numéricos organizados en 4 capítulos principales:
+                        </p>
+                        <ul>
+                            <li><strong>Capítulo 1:</strong> Métodos para encontrar raíces</li>
+                            <li><strong>Capítulo 2:</strong> Sistemas de ecuaciones lineales</li>
+                            <li><strong>Capítulo 3:</strong> Interpolación numérica</li>
+                            <li><strong>Capítulo 4:</strong> Integración numérica</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">Navegación Rápida</h5>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <a href="{{ url_for('capitulo1') }}" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-calculator"></i><br>
+                                    Capítulo 1<br>
+                                    <small>Raíces de Ecuaciones</small>
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="{{ url_for('capitulo2') }}" class="btn btn-outline-success w-100">
+                                    <i class="fas fa-matrix"></i><br>
+                                    Capítulo 2<br>
+                                    <small>Sistemas Lineales</small>
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="{{ url_for('capitulo3') }}" class="btn btn-outline-warning w-100">
+                                    <i class="fas fa-chart-line"></i><br>
+                                    Capítulo 3<br>
+                                    <small>Interpolación</small>
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="{{ url_for('capitulo4') }}" class="btn btn-outline-info w-100">
+                                    <i class="fas fa-integral"></i><br>
+                                    Capítulo 4<br>
+                                    <small>Integración</small>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('ayuda') }}" class="btn btn-secondary">
+                                <i class="fas fa-question-circle"></i> Ver Ayuda General
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle"></i> Instrucciones de Uso</h6>
+                    <p class="mb-0">
+                        Seleccione cualquier capítulo del menú superior para comenzar a explorar los diferentes métodos numéricos. 
+                        Cada capítulo incluye ayuda específica y permite comparar múltiples métodos para determinar cuál es más efectivo 
+                        para cada problema particular.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
